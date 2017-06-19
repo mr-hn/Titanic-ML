@@ -76,7 +76,8 @@ test$Survived[test$Sex == "male"   & test$Child == 1 & test$Pclass == 3 & test$F
 submit2 <- data.frame(PassengerId = test$PassengerId, Survived = test$Survived)
 write.csv(submit2, file = "OutputsMac/submit2.csv", row.names = FALSE)
 
-#Accuracy of 77.99%
+#Accuracy of 79.426%
+#Very good for a manually built model - But let's try to automate it with decision trees
 ```
 ###Working with decision tree
 ```{R}
@@ -92,7 +93,16 @@ prediction <- predict(tree1, test, type = "class" )
 submit3 <- data.frame(PassengerId = test$PassengerId, Survived = prediction)
 write.csv(submit3, file = "OutputsMac/submit3.csv", row.names = FALSE)
 
-#Much improved accuracy of 78.469% since other factors are taken into account as well
+#Accuracy of 78.469% since other features are taken into account as well
+#This could indicate that these factors are negatively impacting the model
+#But one should also keep in mind that the test dataset is small and hence this drop in accuracy need not indicate negative impact
+
+library(rattle)
+library(rpart.plot)
+library(RColor.Brewer)
+fancyRpartPlot(tree1)
+#HN
+#Study the tree to see which feature is throwing off the results
 ```
 ###Feature Engineering
 ```{R}
@@ -139,7 +149,7 @@ train <- combi[1:891,]
 test <- combi[892:1309,]
 
 #Build the model
-tree2 <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize +                   FamilyID, 
+tree2 <- rpart(Survived ~ Pclass + Sex + Age + SibSp + Parch + Fare + Embarked + Title + FamilySize +                            FamilyID, 
                data=train, method="class")
 
 #Predict output and build csv
@@ -147,7 +157,15 @@ prediction <- predict(tree2, test, type = "class")
 submit4 <- data.frame(PassengerId = test$PassengerId, Survived = prediction)
 write.csv(submit4, file = "OutputsMac/submit4.csv", row.names = FALSE)
 
-#Far improved accuracy at 79.426%
+#Accuracy improved back to 79.426%
+#The new features definitely helps in building a better model
+
+library(rattle)
+library(rpart.plot)
+library(RColor.Brewer)
+fancyRpartPlot(tree2)
+#HN
+#Study the tree to see which feature is throwing off the results
 ```
 ###Working with random forest
 ```{R}
@@ -203,7 +221,9 @@ submit5 <- data.frame(PassengerId = test$PassengerId, Survived = prediction)
 write.csv(submit5, file = "OutputsMac/submit5.csv", row.names = FALSE)
 
 #Lower accuracy at 77.033 %.
-#Small test dataset, probably the better model though
+#Again, this could be because of smaller dataset. This is probably the better model
+#HN
+#Study the model
 ```
 ###Forest of conditional inference trees
 ```{R}
